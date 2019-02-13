@@ -1,0 +1,52 @@
+insert or replace procedure ins_movie()
+is
+movie_title movie.title%type; 
+movie_genre movie.genre%type;  
+imdb_id number;
+tmdb_id number;
+movie_id number;
+ch varchar(1):='y';
+ch2 varchar(1):='y';
+i number:=0;
+tagg varchar(20);
+time varchar(25);
+tag_id number;
+begin
+select movieId into movie_id from movie
+where movieId = (select max(movieId) from movie);
+movie_id:=movie_id+1;
+accept movie_title prompt 'Enter title of the movie you want to insert:';
+dbms_output.put_line('You can now insert the genres of the movie you want to insert');
+while ch='y' loop
+	accept movie_genre prompt 'Enter genre of the movie you want to insert:';
+	insert into movie 
+	values(movie_id,movie_title,movie_genre);
+	accept ch prompt 'Do you want to continue(y/n)?';
+end loop;
+accept imdb_id prompt 'Enter IMDB ID of the movie:';
+accept tmdb_id prompt 'Enter TMDB ID of the movie:';
+insert into link
+values(movie_id,imdb_id,tmdb_id);
+select to_char(LOCALTIMESTAMP) into time from dual;
+while ch2='y' and i < 3 loop
+	accept tagg prompt 'Enter tag of the movie you want to insert:';
+	insert into tag
+	values(movie_id+1,tagg,time);
+	if(tagg not in (select distinct tag from genome_tags))
+	then
+		select tagId into tag_id from genome_tags
+		where tagId = (select max(tagId) from genome_tags);
+		tag_id:=tag_id+1;
+		insert into genome_tags 
+		values(tag_id,tagg);
+	end if;
+	accept ch prompt 'Do you want to continue(y/n)?';
+end loop;
+end;
+/
+
+
+
+
+
+execute ins_movie()

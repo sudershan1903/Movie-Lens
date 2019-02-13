@@ -1,0 +1,26 @@
+create or replace procedure ins_review
+as 
+user_id rating.userID%type;
+movie_title movie.title%type;
+cursor c is select * from movie;	
+rati rating.score%type;
+time rating.timestamp%type;
+begin
+open c;
+accept user_id prompt 'Enter your USER ID:';
+select to_char(LOCALTIMESTAMP) into time from dual;
+for bb in c loop
+	if lower(movie_title):=lower(c.title) then
+		accept rati prompt 'Enter rating for the movie:';
+		insert into rating
+		values(user_id,bb.movieId,rati,time);
+		EXIT;
+	end if;
+end loop;
+end;
+/
+
+
+
+execute ins_review();
+	

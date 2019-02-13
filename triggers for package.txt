@@ -1,0 +1,37 @@
+create or replace trigger dbms_ins
+after insert
+on movie
+for each row
+declare 
+name movie.title%type;
+begin
+name:=:new.title;
+dbms_output.put_line('New movie '||name||' inserted!!');
+end;
+/
+
+create or replace trigger dbms_rev
+after insert
+on rating
+for each row
+declare 
+uid number;
+mid number;
+name movie.title%type;
+pts rating.score%type;
+begin
+uid:=:new.userId;
+mid:=:new.movieId;
+pts:=:new.score;
+select title into name from movie
+where movieId=mid;
+if pts>4 then
+dbms_output.put_line('Hey User'||uid||'!!You have rated '||name||' an Excellent movie!!');
+elif pts>3 then
+dbms_output.put_line('Hey User'||uid||'!!You have rated '||name||' a Good movie!!');
+elif pts>2 then
+dbms_output.put_line('Hey User'||uid||'!!You have rated '||name||' an Average movie!!');
+elif pts>1 then
+dbms_output.put_line('Hey User'||uid||'!!You have rated '||name||' a Below Average movie!!');
+end;
+/
